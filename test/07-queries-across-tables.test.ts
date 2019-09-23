@@ -37,7 +37,6 @@ describe("Queries Across Tables", () => {
 
                 }
             ]);
-
             done();
         },
         minutes(3)
@@ -99,7 +98,6 @@ describe("Queries Across Tables", () => {
                     count: 157
                 }
             ]);
-
             done();
         },
         minutes(3)
@@ -122,7 +120,6 @@ describe("Queries Across Tables", () => {
                 original_title: "Hamlet",
                 count: 20
             });
-
             done();
         },
         minutes(3)
@@ -158,42 +155,105 @@ describe("Queries Across Tables", () => {
                     five_stars_count: 81184
                 },
             ]);
-
             done();
         },
         minutes(3)
     );
 
     it(
-        "should select top three genres ordered by average rating",
+        "should select top three production companies with most movies produced",
         async done => {
             const query = `
-            SELECT round(avg(mr.rating), 2) AS avg_rating, g.genre AS genre
+            SELECT count(1) as movie_count, pc.company_name as company_name
             FROM movies m
-            JOIN movie_ratings mr ON mr.movie_id = m.id
-            JOIN movie_genres mg ON mg.movie_id = m.id
-            JOIN genres g ON g.id = mg.genre_id
-            GROUP BY genre
-            ORDER BY avg_rating DESC
-            LIMIT 3
+            JOIN movie_production_companies mpc on mpc.movie_id = m.id
+            JOIN production_companies pc on pc.id = mpc.company_id
+            GROUP BY company_name
+            ORDER BY movie_count DESC
+            Limit 3
             `;
             const result = await db.selectMultipleRows(query);
 
             expect(result).toEqual([
                 {
-                    genre: 'Western',
-                    avg_rating: 3.64
+                    movie_count: 520,
+                    company_name: 'Universal Pictures'
                 },
                 {
-                    genre: 'Crime',
-                    avg_rating: 3.62
+                    movie_count: 506,
+                    company_name: 'Warner Bros.'
                 },
                 {
-                    genre: 'Animation',
-                    avg_rating: 3.6
+                    movie_count: 430,
+                    company_name: 'Paramount Pictures'
                 },
             ]);
+            done();
+        },
+        minutes(3)
+    );
 
+    it(
+        "should select top three grossing production companies (by adjusted revenue)",
+        async done => {
+            const query = `
+            SELECT round(sum(m.revenue_adjusted), 2) as total_revenue, pc.company_name as company_name
+            FROM movies m
+            JOIN movie_production_companies mpc on mpc.movie_id = m.id
+            JOIN production_companies pc on pc.id = mpc.company_id
+            GROUP BY company_name
+            ORDER BY total_revenue DESC
+            Limit 3
+            `;
+            const result = await db.selectMultipleRows(query);
+
+            expect(result).toEqual([
+                {
+                    total_revenue: 70759770415.2,
+                    company_name: 'Warner Bros.'
+                },
+                {
+                    total_revenue: 64287281349.44,
+                    company_name: 'Universal Pictures'
+                },
+                {
+                    total_revenue: 57250933984.63,
+                    company_name: 'Paramount Pictures'
+                },
+            ]);
+            done();
+        },
+        minutes(3)
+    );
+
+    it(
+        "should select top three actors rated by movie revenue (adjusted) they starred in",
+        async done => {
+            const query = `
+            SELECT round(sum(m.revenue_adjusted), 2) as total_movie_revenue, a.full_name as actor_name
+            FROM movies m
+            JOIN movie_actors ma on ma.movie_id = m.id
+            JOIN actors a on a.id = ma.actor_id
+            GROUP BY actor_name
+            ORDER BY total_movie_revenue DESC
+            Limit 3
+            `;
+            const result = await db.selectMultipleRows(query);
+
+            expect(result).toEqual([
+                {
+                    total_movie_revenue: 14585816584.95,
+                    actor_name: 'Harrison Ford'
+                },
+                {
+                    total_movie_revenue: 10672385155.45,
+                    actor_name: 'Tom Hanks'
+                },
+                {
+                    total_movie_revenue: 10558540808.61,
+                    actor_name: 'Tom Cruise'
+                },
+            ]);
             done();
         },
         minutes(3)

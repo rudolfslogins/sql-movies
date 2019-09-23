@@ -227,4 +227,109 @@ describe("Simple Queries", () => {
     },
     minutes(3)
   );
+
+  it(
+    "should select top three movies with most ratings",
+    async done => {
+      const query = `
+      SELECT user_id, count(1) AS count
+      FROM movie_ratings
+      GROUP BY user_id
+      ORDER BY count desc
+      LIMIT 3
+      `;
+      const result = await db.selectMultipleRows(query);
+
+      expect(result).toEqual([
+        {
+          user_id: 8659,
+          count: 349
+        },
+        {
+          user_id: 179792,
+          count: 313
+        },
+        {
+          user_id: 107720,
+          count: 294
+        }
+      ]);
+
+      done();
+    },
+    minutes(3)
+  );
+
+  it(
+    "should select actors whose name starts with 'T' and ends with 'M' and surname starts with 'H' and ends with 'S'",
+    async done => {
+      const query = `
+      SELECT full_name AS name_surname
+      FROM actors
+      WHERE full_name LIKE 'T%M H%S'
+      `;
+      const result = await db.selectMultipleRows(query);
+
+      expect(result).toEqual([
+        {
+          name_surname: 'Tom Hanks'
+        },
+        {
+          name_surname: 'Tim Hands'
+        },
+        {
+          name_surname: 'Tom Hughes'
+        },
+        {
+          name_surname: 'Tom Hodgkins'
+        },
+        {
+          name_surname: 'Tom Hodges'
+        }
+      ]);
+
+      done();
+    },
+    minutes(3)
+  );
+
+  it(
+    "should select top five longest running movies in format (H : M))",
+    async done => {
+      const query = `
+      SELECT (runtime / 60) || ' : ' || (runtime - (runtime / 60 * 60 )) AS runtime_hours, original_title AS title
+      FROM movies
+      ORDER BY runtime DESC
+      LIMIT 5
+      `;
+      const result = await db.selectMultipleRows(query);
+
+      console.log(db.selectMultipleRows(query));
+      expect(result).toEqual([
+        {
+          runtime_hours: '15 : 0',
+          title: 'The Story of Film: An Odyssey'
+        },
+        {
+          runtime_hours: '14 : 37',
+          title: 'Taken'
+        },
+        {
+          runtime_hours: '11 : 45',
+          title: 'Band of Brothers'
+        },
+        {
+          runtime_hours: '9 : 26',
+          title: 'Shoah'
+        },
+        {
+          runtime_hours: '9 : 21',
+          title: 'North and South, Book I'
+        }
+      ]);
+
+      done();
+    },
+    minutes(3)
+  );
 });
