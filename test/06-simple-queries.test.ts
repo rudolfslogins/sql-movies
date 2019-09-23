@@ -232,9 +232,9 @@ describe("Simple Queries", () => {
     "should select top three movies with most ratings",
     async done => {
       const query = `
-      SELECT user_id, count(1) AS count
+      SELECT movie_id, count(1) AS count
       FROM movie_ratings
-      GROUP BY user_id
+      GROUP BY movie_id
       ORDER BY count desc
       LIMIT 3
       `;
@@ -242,16 +242,16 @@ describe("Simple Queries", () => {
 
       expect(result).toEqual([
         {
-          user_id: 8659,
-          count: 349
+          movie_id: 8745,
+          count: 22880
         },
         {
-          user_id: 179792,
-          count: 313
+          movie_id: 4930,
+          count: 22021
         },
         {
-          user_id: 107720,
-          count: 294
+          movie_id: 4224,
+          count: 16908
         }
       ]);
 

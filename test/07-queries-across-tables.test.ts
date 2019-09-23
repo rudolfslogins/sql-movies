@@ -227,30 +227,30 @@ describe("Queries Across Tables", () => {
     );
 
     it(
-        "should select top three actors rated by movie revenue (adjusted) they starred in",
+        "should select top three actors rated by movie revenue (adjusted) they starred in (in Billion)",
         async done => {
             const query = `
-            SELECT round(sum(m.revenue_adjusted), 2) as total_movie_revenue, a.full_name as actor_name
+            SELECT round(sum(m.revenue_adjusted) / 1000000000, 2) || ' bil.' as total_movie_revenue, a.full_name as actor_name
             FROM movies m
             JOIN movie_actors ma on ma.movie_id = m.id
             JOIN actors a on a.id = ma.actor_id
             GROUP BY actor_name
-            ORDER BY total_movie_revenue DESC
+            ORDER BY round(sum(m.revenue_adjusted) / 1000000000, 2) DESC
             Limit 3
             `;
             const result = await db.selectMultipleRows(query);
 
             expect(result).toEqual([
                 {
-                    total_movie_revenue: 14585816584.95,
+                    total_movie_revenue: '14.59 bil.',
                     actor_name: 'Harrison Ford'
                 },
                 {
-                    total_movie_revenue: 10672385155.45,
+                    total_movie_revenue: '10.67 bil.',
                     actor_name: 'Tom Hanks'
                 },
                 {
-                    total_movie_revenue: 10558540808.61,
+                    total_movie_revenue: '10.56 bil.',
                     actor_name: 'Tom Cruise'
                 },
             ]);
