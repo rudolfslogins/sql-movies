@@ -78,7 +78,7 @@ const insertMovies = (movies: Movie[]) => {
         '${escape(movie.revenue.toString())}',
         '${escape(movie.originalTitle)}',
         '${escape(movie.homepage)}',
-        '${escape(movie.tagline ? movie.tagline : "")}',
+        ${movie.tagline ? "'" + escape(movie.tagline) + "'" : null},
         '${escape(movie.overview)}',
         '${escape(movie.runtime.toString())}',
         '${escape(movie.releaseDate)}',
