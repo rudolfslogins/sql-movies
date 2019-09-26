@@ -50,6 +50,30 @@ export const selectProductionCompaniesByMovieId = (movieId: number): string => {
   return `select pc.company_name from movie_production_companies mpc join production_companies pc on pc.id = mpc.company_id where mpc.movie_id = ${movieId}`;
 };
 
+export const selectMovieById = (id: number): string => {
+  return `SELECT original_title, tagline FROM movies WHERE id = ${id}`;
+};
+
+export const selectGenreById = (id: number): string => {
+  return `SELECT genre FROM genres WHERE id = ${id}`;
+};
+
+export const selectDirectorById = (id: number): string => {
+  return `SELECT full_name FROM directors WHERE id = ${id}`;
+};
+
+export const selectActorById = (id: number): string => {
+  return `SELECT full_name FROM actors WHERE id = ${id}`;
+};
+
+export const selectKeywordById = (id: number): string => {
+  return `SELECT keyword FROM keywords WHERE id = ${id}`;
+};
+
+export const selectProductionCompanyById = (id: number): string => {
+  return `SELECT company_name FROM production_companies WHERE id = ${id}`;
+};
+
 /**
  * select count as c, because an object is returned and expected property name is c
 */
